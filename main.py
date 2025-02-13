@@ -57,30 +57,59 @@
 # користувач. Після чого для кожного студента виведіть
 # інформацію про нього за допомогою метода
 
-class Student:
-    def __init__(self, name, age):
-        self.name = name
-        self.age = age
+# class Student:
+#     def __init__(self, name, age):
+#         self.name = name
+#         self.age = age
+#
+#     def print_info(self):
+#         print(f"Імя: {self.name}")
+#         print(f"Вік: {self.age}")
+#         print()
+#
+#
+# students = []
+# for _ in range(3):
+#     name = input("Імя: ")
+#     age = int(input("Вік: "))
+#
+#     student = Student(name, age)
+#     students.append(student)
+#
+# for student in students:
+#     student.print_info()
 
-    def print_info(self):
-        print(f"Імя: {self.name}")
-        print(f"Вік: {self.age}")
-        print()
+
+# 1. Створіть клас Cart(кошик клієнта магазину) з атрибутами
+#client(ім’я клієнта) та items(список товарів).
+#Додайте метод який додає новий товар до кошика
+#Додайте метод який видаляє товар з кошика
+#Додайте метод для виведення інформації про кошик
+
+class Cart:
+    def __init__(self, client):
+        self.client = client
+        self.items = []
+
+    def add_item(self):
+        self.items.append(input("новий товар: "))
+
+    def clear(self):
+        self.items.clear()
 
 
-students = []
-for _ in range(3):
-    name = input("Імя: ")
-    age = int(input("Вік: "))
-
-    student = Student(name, age)
-    students.append(student)
-
-for student in students:
-    student.print_info()
+    def print_items(self):
+        print(f"список товарів: {self.items} клієнта магазину {self.client}")
 
 
+cart1 = Cart(client = input("ім’я клієнта: "))
 
+cart1.add_item()
+cart1.add_item()
+
+cart1.print_items()
+cart1.clear()
+cart1.print_items()
 
 
 
