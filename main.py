@@ -1,83 +1,3 @@
-# class Dog
-
-# опис класу, шаблон
-# class Dog:
-#     # конструктор для створення об'єктів класу
-#     def __init__(self, name, age, weight):
-#         # self -- обєкт класу(конкретний пес)
-#         if age < 0:
-#             raise ValueError("вік пса неможе бути від'ємні")
-#
-#         self.name = name
-#         self.age = age
-#         self.weight = weight
-#
-#     # можливість гавкати
-#     # метод
-#     def make_sound(self):
-#         print("Гав")
-#
-#
-#     def print_info(self):
-#         # вивід інформації про песика
-#         print(self.name, self.age, self.weight)
-
-
-# конкретні песики
-# dog1 = Dog()  # об'єкт клас Dog
-#
-# print(dog1.name)
-# print(dog1.age)
-# print(dog1.weight)
-#
-# dog2 = Dog()
-#
-# dog2.name = 'Lev' # зміна
-#
-# print(dog2.name)
-# print(dog2.age)
-# print(dog2.weight)
-#
-# # використання метода
-# dog1.make_sound()
-
-
-# dog1 = Dog(name='Lev', age=3, weight=7)
-# print(dog1.name)
-#
-# dog2 = Dog(name='Carl', age=5, weight=10)
-# print(dog2.name)
-#
-#
-# dog1.print_info()  # self = dog1
-# dog2.print_info()  # self = dog2
-
-
-# Створіть список з 3-ма студентами, дані вводить
-# користувач. Після чого для кожного студента виведіть
-# інформацію про нього за допомогою метода
-
-# class Student:
-#     def __init__(self, name, age):
-#         self.name = name
-#         self.age = age
-#
-#     def print_info(self):
-#         print(f"Імя: {self.name}")
-#         print(f"Вік: {self.age}")
-#         print()
-#
-#
-# students = []
-# for _ in range(3):
-#     name = input("Імя: ")
-#     age = int(input("Вік: "))
-#
-#     student = Student(name, age)
-#     students.append(student)
-#
-# for student in students:
-#     student.print_info()
 
 
 # 1. Створіть клас Cart(кошик клієнта магазину) з атрибутами
@@ -111,6 +31,28 @@ cart1.print_items()
 cart1.clear()
 cart1.print_items()
 
+# 2.Створіть клас Phone з атрибутами number та battery_level.
+#Додайте метод який зменшує заряд телефона(на скільки
+#зменшити відсотків передається як параметр), якщо він
+#опуститься нижче 20%, вивести повідомлення
+#Додайте метод для виведення інформації про телефон.
+
+class Phone():
+    def __init__(self, number, battery_level):
+        self.number = number
+        self.battery_level = battery_level
 
 
+    def low_balance(self, procent):
+        self.battery_level -= procent
+        if self.battery_level < 20:
+            print("заряд телефона опуститься нижче 20%")
+
+    def print_info(self):
+        print(f"заряд телефона {self.number}  складає {self.battery_level} %")
+
+
+phone1 = Phone("098889900", 100)
+phone1.low_balance(82)
+phone1.print_info()
 
