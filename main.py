@@ -1,125 +1,325 @@
+# Завдання 1
+# Створіть наступні класи:
+#  Rectangle – атрибути width, height
+#  Circle – атрибути radius
+#  Triangle – атрибути a, b, c
+
+# Методи:
+#  get_perimeter()
+#  display_info()
+
+# Напишіть функцію create_figure() яка запитує у користувача
+# тип фігури та потрібні атрибути і повертає об’єкт.
+# Створіть декілька фігур, добавте їх у список та для кожної
+# викличте відповідні методи.
+
+from math import pi
+#import math
 
 
-##BANK###
+# поліморфізм
+class Rectangle:
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
 
-# Напишіть клас Банківський рахунок з атрибутами:
-#  ім'я клієнта
-#  баланс
-#  валюта
-#  словник з курсом валют(однаковий для всіх)
-# Додайте методи:
-#  вивід загальної інформації
-#  перевірка чи відома валюта(якщо ні, викликати
-# ValueError)
-#  перевести гроші з однієї валюти в іншу(ця операція
-# часто використовується, тому зрочно реалізувати
-# окремим методом)
-#  зміна валюти
-#  поповнення балансу(валюта та сама)
-#  зняття грошей з балансу(валюта та сама).
-
-
-class BankAccount:
-    # словник курсів валют (однаковий для всіх)
-    exchange_rates = {
-        "UAH": 1,  # базова валюта
-        "USD": 40,  # 1 USD = 40 UAH
-        "EUR": 44,  # 1 EUR = 44 UAH
-        "GBP": 50  # 1 GBP = 50 UAH
-    }
-
-    def __init__(self, client_name, balance, currency):
-        self.client_name = client_name
-        self.balance = balance
-        self.currency = currency.upper()
-        self.check_currency(self.currency)  # Перевірка, чи валюта відома
-
-    def check_currency(self, currency):
-        """Перевіряє, чи вказана валюта присутня у словнику курсів."""
-        if currency.upper() not in BankAccount.exchange_rates:
-            raise ValueError(f"Невідома валюта: {currency}.")
-        #return True
+    def get_perimeter(self):
+        return 2 * (self.width + self.height)
 
     def display_info(self):
-
-        print(f"клієнт: {self.client_name}")
-        print(f"Баланс: {self.balance:.2f} {self.currency}")
-        print("Курси валют (до базової, UAH):")
-
-        for curr, rate in BankAccount.exchange_rates.items():
-            print(f"  {curr}: {rate}")
+        perim = self.get_perimeter()
+        print(f"Прямокутник")
+        print(f"ширина: {self.width} "
+              f"висота: {self.height} "
+              f"периметр: {perim} ")
 
 
-    def convert(self, amount, from_currency, to_currency):
-        """
-        Переводить суму з однієї валюти в іншу.
-        Формула: amount * (rate_from / rate_to)
-        """
-        from_curr = from_currency.upper()
-        to_curr = to_currency.upper()
-        # Перевірка валют
-        if from_curr not in BankAccount.exchange_rates or to_curr not in BankAccount.exchange_rates:
-            raise ValueError("1 або 2 валюти невідомі")
+class Circle:
+    def __init__(self, radius):
+        self.radius = radius
+
+    def get_perimeter(self):
+        # return 2 * math.pi * self.radius
+        return 2 * pi * self.radius
+
+    def display_info(self):
+        perim = self.get_perimeter()
+        print(f"Коло")
+        print(f"радіус: {self.radius} "
+              f"периметр: {perim} ")
 
 
-        rate_from = BankAccount.exchange_rates[from_curr]
-        rate_to = BankAccount.exchange_rates[to_curr]
+class Triangle:
+    def __init__(self, a, b, c):
+        self.a = a
+        self.b = b
+        self.c = c
 
-        amount_in_base = amount * rate_from
-        converted_amount = amount_in_base / rate_to
-        return converted_amount
+    def get_perimeter(self):
+        return self.a + self.b + self.c
 
-    def change_currency(self, new_currency):
+    def display_info(self):
+        perim = self.get_perimeter()
+        print(f"Трикутник")
+        print(f"сторони: {self.a}, {self.b}, {self.c} "
+              f"периметр: {perim} ")
 
-        new_currency = new_currency.upper()
-        self.check_currency(new_currency)
 
-        if new_currency == self.currency:
-            print("Нова валюта співпадає з поточною. Зміни не потрібні.")
+def create_figure():
+    figure_type = input("Enter figure type: ")
+
+    if figure_type == 'circle':
+        radius = float(input('Enter radius'))
+        return Circle(radius)
+
+    elif figure_type == 'rect':
+        user_width = float(input("Entre width: "))
+        user_height = float(input("Enter height: "))
+        return Rectangle(width=user_width, height=user_height)
+
+    elif figure_type == 'triangle':
+        a = float(input("Enter side a: "))
+        b = float(input("Enter side b: "))
+        c = float(input("Enter side c: "))
+        return Triangle(a, b, c)
+
+    else:
+        print('Unknown figure')
+
+
+
+# використання
+# figure = create_figure()
+#
+# print(type(figure))
+#
+# if figure is not None:
+#     figure.display_info()
+
+#
+# figures = []
+# for _ in range(3):
+#     figure = create_figure()
+#
+#     if figure is not None:
+#         figures.append(figure)
+#
+# print(figures)
+#
+# for figure in figures:
+#     figure.display_info()
+#
+# class Car:
+#     def __init__(self, speed):
+#         self.check_speed(speed)
+#         self.speed = speed
+#
+#     def move(self):
+#         print(f"Автомобіль їде по шосе зі швидкістю {self.speed}")
+#
+#     @staticmethod
+#     def check_speed(speed):
+#         if speed < 20 or speed > 200:
+#             raise ValueError("Швидкість не відповідає діапазону [20 .. 200].")
+#
+#
+# class Bicycle:
+#     def __init__(self, speed):
+#         self.check_speed(speed)
+#         self.speed = speed
+#
+#     def move(self):
+#         print(f"Велосипед їде по дорозі зі швидкістю {self.speed}")
+#
+#     @staticmethod
+#     def check_speed(speed):
+#         if speed < 10 or speed > 30:
+#             raise ValueError("Швидкість не відповідає діапазону [10 .. 30].")
+#
+#
+# class Boat:
+#     def __init__(self, speed):
+#         self.check_speed(speed)
+#         self.speed = speed
+#
+#     def move(self):
+#         print(f"Човен пливе по воді зі швидкістю {self.speed}")
+#
+#     @staticmethod
+#     def check_speed(speed):
+#         if speed < 0 or speed > 50:
+#             raise ValueError("Швидкість не відповідає діапазону [0 .. 50].")
+#
+#
+#
+# def create_vehicle():
+#     try:
+#         print("Доступний транспорт: Car, Bicycle, Boat")
+#         vehicle, speed = input("Введіть назву транспорту та швидкість через пробєл: ").split()
+#         vehicle = vehicle.capitalize()
+#         speed = int(speed)
+#     except Exception as err:
+#         print(err)
+#         return
+#
+#     try:
+#         if vehicle == "Car":
+#             return Car(speed)
+#         elif vehicle == "Bicycle":
+#             return Bicycle(speed)
+#         elif vehicle == "Boat":
+#             return Boat(speed)
+#         else:
+#             print("Невірно введено назву транспорту.")
+#     except ValueError as err:
+#         print(err)
+#
+# vehicle = create_vehicle()
+#
+# if vehicle is not None:
+#     vehicle.move()
+#
+#
+#     class Car:
+#         def __init__(self, speed):
+#             self.check_speed(speed)
+#             self.speed = speed
+#
+#         def move(self):
+#             print(f"Автомобіль їде по шосе зі швидкістю {self.speed}")
+#
+#         @staticmethod
+#         def check_speed(speed):
+#             if speed < 20 or speed > 200:
+#                 raise ValueError("Швидкість не відповідає діапазону [20 .. 200].")
+#
+#
+#     class Bicycle:
+#         def __init__(self, speed):
+#             self.check_speed(speed)
+#             self.speed = speed
+#
+#         def move(self):
+#             print(f"Велосипед їде по дорозі зі швидкістю {self.speed}")
+#
+#         @staticmethod
+#         def check_speed(speed):
+#             if speed < 10 or speed > 30:
+#                 raise ValueError("Швидкість не відповідає діапазону [10 .. 30].")
+#
+#
+#     class Boat:
+#         def __init__(self, speed):
+#             self.check_speed(speed)
+#             self.speed = speed
+#
+#         def move(self):
+#             print(f"Човен пливе по воді зі швидкістю {self.speed}")
+#
+#         @staticmethod
+#         def check_speed(speed):
+#             if speed < 0 or speed > 50:
+#                 raise ValueError("Швидкість не відповідає діапазону [0 .. 50].")
+#
+#
+#     def create_vehicle():
+#         try:
+#             print("Доступний транспорт: Car, Bicycle, Boat")
+#             vehicle, speed = input("Введіть назву транспорту та швидкість через пробєл: ").split()
+#             vehicle = vehicle.capitalize()
+#             speed = int(speed)
+#         except Exception as err:
+#             print(err)
+#             return
+#
+#         try:
+#             if vehicle == "Car":
+#                 return Car(speed)
+#             elif vehicle == "Bicycle":
+#                 return Bicycle(speed)
+#             elif vehicle == "Boat":
+#                 return Boat(speed)
+#             else:
+#                 print("Невірно введено назву транспорту.")
+#         except ValueError as err:
+#             print(err)
+#
+#
+#     vehicle = create_vehicle()
+#
+#     if vehicle is not None:
+#         vehicle.move()
+
+# Створіть наступні класи:
+#  Manager – атрибути name, base_salary
+#  Developer – атрибути name, base_salary, work_experience
+#  Intern – атрибути name, base_salary
+# Методи:
+#  print_salary() – менеджер отримує базову ставку,
+# розробник отримує на 20% більше якщо стаж більше 4
+# років, інтерн отримує половину базової ставки
+
+# Напишіть функцію create_worker() яка запитує у
+# користувача тип працівника та потрібні атрибути і повертає
+# об’єкт.
+# Створіть декілька співробітників, добавте їх у список та для
+# кожного викличте відповідні методи.
+
+class Manager:
+    def __init__(self, name, base_salary):
+        self.name = name
+        self.base_salary = base_salary
+
+    def print_salary(self):
+       print(f"менеджер {self.name} отримує {self.base_salary}")
+
+
+class Developer:
+    def __init__(self, name, base_salary, work_experience):
+        self.name = name
+        self.base_salary = base_salary
+        self.work_experience = work_experience
+
+    def print_salary(self):
+        if self.work_experience > 4:
+            salary = self.base_salary*1.2
         else:
-            # Перераховуємо баланс у нову валюту
-            new_balance = self.convert(self.balance, self.currency, new_currency)
-            print(f"Зміна валюти з {self.currency} на {new_currency}.")
-            print(f"Баланс: {self.balance:.2f} {self.currency} -> {new_balance:.2f} {new_currency}")
-            self.balance = new_balance
-            self.currency = new_currency
+            salary = self.base_salary
 
-    def deposit(self, amount):
-
-        if amount <= 0:
-            print("Сума для поповнення має бути позитивною.")
-        else:
-            self.balance += amount
-            print(f"Поповнення на {amount:.2f} {self.currency}. Новий баланс: {self.balance:.2f} {self.currency}")
-
-    def withdraw(self, amount):
-
-        if amount <= 0:
-            print("Сума для зняття має бути позитивною.")
-        elif amount > self.balance:
-            print("Недостатньо коштів для зняття.")
-        else:
-            self.balance -= amount
-            print(f"Зняття {amount:.2f} {self.currency}. Залишок: {self.balance:.2f} {self.currency}")
+        print(f"розробник {self.name} отримує {salary}")
 
 
-# Приклад :
-try:
-    account = BankAccount("Anna", 10030, "USD")
-    account.display_info()
+class Intern:
+    def __init__(self, name, base_salary):
+        self.name = name
+        self.base_salary = base_salary
 
-    print("\nПоповнення рахунку:")
-    account.deposit(2000)
+    def print_salary(self):
+        print(f"інтерн {self.name} отримує {self.base_salary/2}")
 
-    print("\nЗняття коштів:")
-    account.withdraw(1530)
 
-    print("\nПеревід валюти:")
-    account.change_currency("EUR")
+def create_worker():
+    print("тип працівника: manager, developer, intern")
+    worker_type = input("Введіть тип працівника: ").lower()
+    name = input("Введіть им’я працівника: ").capitalize()
+    base_salary = int(input("Введіть базову ставку: "))
 
-    print("\nСпроба з невідомою валютою:")
-    account.change_currency("ABC")  # ValueError
+    if worker_type == "developer":
+        work_experience = int(input("Введіть стаж: "))
+        return Developer(name, base_salary, work_experience)
+    elif worker_type == "manager":
+        return Manager(name, base_salary)
+    elif worker_type == "intern":
+        return Intern(name, base_salary)
+    else:
+        print("Помилка! тип працівника: manager, developer, intern")
 
-except ValueError as ve:
-    print(f"Помилка: {ve}")
+
+worker = create_worker()
+worker.print_salary()
+
+
+
+
+
 
