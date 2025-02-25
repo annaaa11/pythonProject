@@ -17,7 +17,7 @@ class Recipe:
         return f"назва страви - {self.name} "
 
     def __gt__(self, other): # – перевіряє чи є час приготування self більшим за other
-        return len(self) > len(other)
+        return self.time > other.time
 
     #  перевіряє     чи     є     інгредієнт     в     рецепті
     def __contains__(self, ingredient): #
@@ -56,10 +56,8 @@ for recipe in recipes:
         print(f"- {recipe}")
 
 # Рецепт з найменшим часом приготування
-fastest_recipe = recipes[0]
-for recipe in recipes[1:]:
-    if recipe.time < fastest_recipe.time:
-        fastest_recipe = recipe
+fastest_recipe = min(recipes)
+
 
 print("\nРецепт з найменшим часом приготування:")
 fastest_recipe.display_info()
