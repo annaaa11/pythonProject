@@ -1,63 +1,65 @@
-# Створіть наступні класи:
-#  CreditCardPayment – атрибути currency
-#  PayPalPayment – атрибути currency
-#  CryptoPayment – атрибути currency
-# Методи:
-#  pay(amount) – виводить повідомлення
-# o CreditCardPayment – оплата карткою {amount}{currency}
-# o PayPalPayment – оплата PayPal {amount}{currency}
-# o CryptoPayment – оплата криптогаманцем {amount}{currency}
-# Напишіть функцію create_payment() яка запитує у
-# користувача тип рахунку та потрібні атрибути і повертає
-# об’єкт.
+# Створіть клас Recipe з атрибутами
+#  name – назва страви
+#  ingredients – список продуктів
+#  text – текст рецепту
+#  time – час приготування
 
 
-class CreditCardPayment:
-    def __init__(self, currency):
-        self.currency = currency
+class Recipe:
+    def __init__(self, name, ingredients, text, time):
+        self.name = name
+        self.ingredients = ingredients
+        self.text = text
+        self.time = time
 
-    def pay(self, amount):
-       print(f"оплата карткою {amount} {self.currency}")
+ #   – повертає     назву     страви
+    def __str__(self):
+        return f"назва страви - {self.name} "
+
+    def __gt__(self, other): # – перевіряє чи є час приготування self більшим за other
+        return len(self) > len(other)
+
+    #  перевіряє     чи     є     інгредієнт     в     рецепті
+    def __contains__(self, ingredient): #
+        return ingredient in self.ingredients
+
+    def display_info(self): # виводить всю інформацію про рецепт
+        print (f"назва страви: {self.name}")
+        print(f"список продуктів: {self.ingredients}")
+        print(f"текст рецепту: {self.text}")
+        print(f"час приготування: {self.time}  хвилин")
 
 
-class PayPalPayment:
-    def __init__(self, currency):
-        self.currency = currency
+#Приклад рецептів:
+Recipe1 = Recipe("Піца",
+["борошно", "вода", "дріжджі", "томат", "сир"],
+"Готуємо тісто, додаємо інгредієнти та запікаємо",
+30)
 
-    def pay(self, amount):
-        print(f"оплата PayPal  {amount} {self.currency}")
+Recipe2 = Recipe("Салат",
+       ["томат", "огірок", "зелень", "олія"],
+       "Нарізаємо овочі, додаємо зелень та поливаємо олією ",
+10)
+
+Recipe3 = Recipe("Суп",
+       ["вода", "картопля", "морква", "м'ясо"],
+       "Варимо всі інгредієнти до готовності",
+       45)
+
+recipes = [Recipe1, Recipe2, Recipe3]
 
 
-class CryptoPayment:
-    def __init__(self, currency):
-        self.currency = currency
+# Виведення рецептів з інгредієнтом "томат"
+print("Рецепти з томатом:")
+for recipe in recipes:
+    if "томат" in recipe:
+        print(f"- {recipe}")
 
-    def pay(self, amount):
-        print(f"оплата криптогаманцем {amount} {self.currency}")
+# Рецепт з найменшим часом приготування
+fastest_recipe = recipes[0]
+for recipe in recipes[1:]:
+    if recipe.time < fastest_recipe.time:
+        fastest_recipe = recipe
 
-
-def create_payment():
-    print("тип рахунку: creditcard, paypal, crypto")
-    payment_type = input("Введіть тип рахунку: ").lower()
-    currency = input("Введіть валюту: ")
-
-    if  payment_type == "creditcard":
-        return CreditCardPayment(currency)
-    elif payment_type == "paypal":
-        return PayPalPayment(currency)
-    elif payment_type == "crypto":
-        return CryptoPayment(currency)
-    else:
-        print("Помилка! тип рахунку: creditcard, paypal, crypto")
-
-# Створіть декілька рахунків, добавте їх у список та для
-# кожної викличте відповідні методи.
-
-payments = []
-for _ in range(3):
-    payment = create_payment()
-    if payment is not None:
-        payments.append(payment)
-
-for payment in payments:
-    payment.pay(int(input("Введіть сумму: ")))
+print("\nРецепт з найменшим часом приготування:")
+fastest_recipe.display_info()
