@@ -29,8 +29,7 @@ class DoublyLinkedList:
         self.tail = None
 
     def __str__(self):
-
-            return f"{self.head}"
+        return f"{self.head}"
 
     def push_end(self, data): #додає new_node в кінець self.tail
         new_node = Node(data)
