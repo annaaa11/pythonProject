@@ -171,7 +171,6 @@ class Project:
         return self.tasks.is_empty()
 ##################
 
-
 task = Task('Підготовка до зйомок')
 
 task.subtasks = [
