@@ -1,232 +1,125 @@
+#
+#
+# # Створіть дочірні класи від Zone та перевизначте метод
+# # serve_passenger() щоб він повертав пару: пасажир та True/False
+# # в залежності від успішності перевірки.
+# # Перевірки:
+# #  реєстрація – наявність білету(у багажі)
+# #  безпека – відсутність небезпечних предметів у багажі:
+# # ніж, зброя, вибухівка
+# #  посадка – перевірка не потрібна
+# # Для цього скористайтесь класом Passenger
+# # Атрибути:
+# #  name – ім’я
+# #  priority – пріоритет
+# #  baggage – список з предметами в багажі
+#
 
-# Використовуючи стеки, змоделюйте роботу над
-# виконанням проекту. Як відомо складні завдання часто
-# розбивають на під задачі в процесі роботи, і тільки коли всі
-# вони виконані вважається що з основним завданням ви
-# впорались.
+from queue import PriorityQueue
 
-# DoubleLinkedList COPY:
-class Node:
-    def __init__(self, data):
-        self.data = data
-        self.next = None
-        self.prev = None
-
-    def __str__(self):
-        return f"{self.data} -> {self.next}"
-
-
-class DoubleLinkedList:
-    """
-    Клас двозв'язного списку.
-    """
-
-    def __init__(self):
-        """
-        Ініціалізація порожнього списку.
-        """
-        self.head = None
-        self.tail = None
-
-    def __str__(self):
-        return str(self.head)
-
-    def push_end(self, data):
-        """
-        Додає елемент у кінець списку.
-        :param data: Дані для додавання
-        """
-        new_node = Node(data)
-        if not self.head:
-            self.head = new_node
-            self.tail = new_node
-        else:
-            self.tail.next = new_node
-            new_node.prev = self.tail
-            self.tail = new_node
-
-    def push_start(self, data):
-        """
-        Додає елемент на початок списку.
-        :param data: Дані для додавання
-        """
-        new_node = Node(data)
-        if not self.head:
-            self.head = new_node
-            self.tail = new_node
-        else:
-            new_node.next = self.head
-            self.head.prev = new_node
-            self.head = new_node
-
-    def pop_end(self):
-        """
-        Видаляє останній елемент зі списку.
-        :return: Дані видаленого елемента або None, якщо список порожній
-        """
-        if not self.tail:
-            return None
-
-        data = self.tail.data
-
-        if self.head.next is None:
-            self.head = None
-            self.tail = None
-        else:
-            self.tail = self.tail.prev
-            self.tail.next = None
-
-        return data
-
-    def pop_start(self):
-        """
-        Видаляє перший елемент зі списку.
-        :return: Дані видаленого елемента або None, якщо список порожній
-        """
-
-        if not self.head:
-            return None
-
-        data = self.head.data
-
-        if self.head.next is None:
-            self.head = None
-            self.tail = None
-        else:
-            self.head = self.head.next
-            self.head.prev = None
-        return data
-
-    def is_empty(self):
-        """
-        Чи є порожній
-        :return: True якщо порожній
-        """
-        return self.head is None
-
-    def peek(self):
-        """
-        Повертає останній елемент, не видаляючи його
-        :return: останній елемент
-        """
-        return self.tail.data
+class Passenger:
+    def __init__(self, name, priority, baggage):
+        self.name = name
+        self.priority = priority
+        self.baggage = baggage  # список предметів у багажі
 
 
-
-# Клас Task(уже реалізований):
-#  do() – виконує завдання(виводить на екран інформацію
-# про це) та повертає список з підзавданням для
-# успішного виконаня
-
-class Task:
+class Zone:
     def __init__(self, name):
         self.name = name
-        self.subtasks = []
+        self.passengers = PriorityQueue()
 
-    def do(self):
-        """
-        Виконує завдання, за потреби розбиває його на підзавдання
-        :return: список підзавдань
-        """
-        if self.subtasks:
-            print(f"Виконую завдання: {self.name}. Розбиваю на підзавдання")
-        else:
-            print(f"Завершено завдання: {self.name}")
+    def add_passenger(self, passenger):
+        priority = passenger.priority
+        pair = (priority, passenger)
+        self.passengers.put(pair)
 
-        return self.subtasks # список
+    def serve_passenger(self):
+        #if not self.passengers.empty():
+        priority, passenger = self.passengers.get()
+        return passenger
+        #return None
 
 
-# Створіть клас Project
-# Атрибути:
-#  tasks – стек з завданнями, об’єкти класу Task ( початкове
-# завдання передається в init)
-# Методи:
-#  do_task() – видалити останнє завдання з стеку та
-# виконати його, якщо для цього потрібно зробити під
-# завдання, то добавити їх у стек
-# Якщо стек порожній то вивести про це повідомлення
-#  is_finished() – True якщо завдань не залишилось
+class RegistrationZone(Zone):
+    def serve_passenger(self):
+        #if not self.passengers.empty():
+        priority, passenger = self.passengers.get()
+            # Перевірка наявності квитка в багажі
+        has_ticket = "ticket" in passenger.baggage
+        return passenger, has_ticket
+        #return None, False
 
-class Project:
-    ## MY CODE
 
-    def __init__(self, initial_task):
-        self.tasks = DoubleLinkedList()
-        self.tasks.push_end(initial_task)
-        #tasks – стек з завданнями, об’єкти класу Task
-        # (initial_task - початкове  завдання передається в init)
+class ControlZone(Zone):
+    def serve_passenger(self):
+        if not self.passengers.empty():
+            priority, passenger = self.passengers.get()
+            # Перевірка на небезпечні предмети
+            dangerous_items = ["knife", "weapon", "explosive"]
+            for item in passenger.baggage:
+                if item in dangerous_items:
+                    return passenger, False
+            return passenger, True
+        return None, False
 
-    def do_task(self):
-        if self.tasks.is_empty():
-            print("Усі завдання виконано!")
-            return
 
-        current_task = self.tasks.pop_end() #  current_task - объект класса Task
-        new_tasks = current_task.do() # запуск метода do() класса Task
+class BoardingZone(Zone):
+    def serve_passenger(self):
+        if not self.passengers.empty():
+            priority, passenger = self.passengers.get()
+            # Для посадки перевірка не потрібна
+            return passenger, True
+        return None, False
 
-        for task in new_tasks:
-            self.tasks.push_end(task)
 
-    def is_finished(self):
-        return self.tasks.is_empty()
-##################
+class Airport:
+    def __init__(self):
+        self.zones = {
+            "Registration": RegistrationZone("Реєстрація"),
+            "Control": ControlZone("Контроль"),
+            "Board": BoardingZone("Посадка")
+        }
+        self.passengers = []
 
-task = Task('Підготовка до зйомок')
+    def add(self, passenger):
+        self.zones["Registration"].add_passenger(passenger)
 
-task.subtasks = [
-    Task('Пошук локацій'),
-    Task('Підготовка сценарію'),
-    Task('Кастинг акторів')
+    def serve_registration(self):
+        passenger, has_ticket = self.zones["Registration"].serve_passenger()
+        if passenger and has_ticket:
+            self.zones["Control"].add_passenger(passenger)
+
+    def serve_security_control(self):
+        passenger, passed_security = self.zones["Control"].serve_passenger()
+        if passenger and passed_security:
+            self.zones["Board"].add_passenger(passenger)
+
+    def serve_boarding(self):
+        passenger, ch = self.zones["Board"].serve_passenger()
+        if passenger:
+            self.passengers.append(passenger)
+
+    def show_statistics(self):
+        print(f"Кількість пасажирів, які пройшли всі зони: {len(self.passengers)}")
+        print("Список пасажирів на борту:")
+        for p in self.passengers:
+            print(f"Пасажир {p.name}")
+
+
+# Тестування
+airport = Airport()
+passengers = [
+    Passenger("Олег", 3, ["ticket", "clothes"]),
+    Passenger("Анна", 1, ["ticket", "knife"]),
+    Passenger("Марія", 4, ["clothes"]),  # немає квитка
+    Passenger("Сергій", 2, ["ticket", "book"])
 ]
 
-# Підзавдання для "Пошук локацій"
-task.subtasks[0].subtasks = [
-    Task('Огляд локацій у місті'),
-    Task('Огляд локацій за містом'),
-    Task('Узгодження місць для зйомок')
-]
+for p in passengers:
+    airport.add(p)
+    airport.serve_registration()
+    airport.serve_security_control()
+    airport.serve_boarding()
 
-# Підзавдання для "Підготовка сценарію"
-task.subtasks[1].subtasks = [
-    Task('Написання основного сценарію'),
-    Task('Редагування сценарію'),
-    Task('Підготовка сценарних приміток'),
-]
-
-# Підзавдання для "Кастинг акторів"
-task.subtasks[2].subtasks = [
-    Task('Пошук головних акторів'),
-    Task('Пошук другорядних акторів'),
-    Task('Підготовка контрактів для акторів')
-]
-
-# Підзавдання для "Пошук локацій у місті"
-task.subtasks[0].subtasks[0].subtasks = [
-    Task('Вибір декорацій для зйомок'),
-    Task('Узгодження з власниками приміщень')
-]
-
-# Підзавдання для "Огляд локацій за містом"
-task.subtasks[0].subtasks[1].subtasks = [
-    Task('Вибір лісу для сцени битви'),
-    Task('Пошук старовинних будівель для сцени'),
-]
-
-# Підзавдання для "Написання основного сценарію"
-task.subtasks[1].subtasks[0].subtasks = [
-    Task('Написання першої частини'),
-    Task('Написання другої частини'),
-]
-
-# Підзавдання для "Пошук головних акторів"
-task.subtasks[2].subtasks[0].subtasks = [
-    Task('Пошук актора на роль головного героя'),
-    Task('Пошук актриси на роль головної героїні')
-]
-
-project = Project(task) # task - задание класса Task
-
-while not project.is_finished():
-    project.do_task()
-
-######
+airport.show_statistics()
