@@ -1,187 +1,95 @@
-# class Node:
-#     def __init__(self, data):
-#         self.data = data
-#         self.left = None
-#         self.right = None
-#
-#
-# class BinaryTree:
-#     def __init__(self):
-#         self.root = None
-#
-#     def add(self, data):
-#         node = Node(data)
-#
-#         if self.root is None:
-#             self.root = node
-#             return
-#
-#         self._recursive_add(self.root, node)
-#
-#     def _recursive_add(self, tree_node, added_node):
-#         if added_node.data < tree_node.data:
-#             # рухаємося наліво
-#
-#             # перевіряємо чи пусто зліва
-#             if tree_node.left is None:
-#                 tree_node.left = added_node
-#                 return  # рекурсія(цикл) закінчується
-#
-#             # якщо не пусто
-#             self._recursive_add(tree_node.left, added_node)
-#         else:
-#             # рухаємося направо
-#
-#             # перевіряємо чи пусто справа
-#             if tree_node.right is None:
-#                 tree_node.right = added_node
-#                 return  # рекурсія(цикл) закінчується
-#
-#             # якщо не пусто
-#             self._recursive_add(tree_node.right, added_node)
-#
-#     def display(self):
-#         nodes_to_display = [self.root]
-#
-#         while len(nodes_to_display) != 0:
-#             # відображаємо все що є в nodes_to_display
-#             for node in nodes_to_display:
-#                 print(node.data, end=' ')
-#             print()
-#
-#             # отримуємо наступні вузли
-#             new_nodes = []
-#             for node in nodes_to_display:
-#                 if node.left is not None:
-#                     new_nodes.append(node.left)
-#
-#                 if node.right is not None:
-#                     new_nodes.append(node.right)
-#
-#             # замінюємо nodes_to_display на нові вузли
-#             nodes_to_display = new_nodes
-#
-#     def get_min(self):
-#         # отримати найменший елемент
-#
-#         node = self.root
-#
-#         while node.left is not None:
-#             node = node.left
-#
-#         return node.data
-#
-#     def find(self, num):
-#         # якщо num в корені
-#         if self.root.data == num:
-#             return True
-#
-#         return self._recursive_find(self.root, num)
-#
-#     def _recursive_find(self, tree_node, num):
-#         # числа нема
-#         if tree_node is None:
-#             return False
-#
-#         # число знайдене
-#         if tree_node.data == num:
-#             return True
-#
-#         if num < tree_node.data:
-#             return self._recursive_find(tree_node.left, num)
-#         else:
-#             return self._recursive_find(tree_node.right, num)
-#
-#
-# tree = BinaryTree()
-# tree.add(5)
-# tree.add(4)
-# tree.add(6)
-# tree.add(3)
-# tree.add(2)
-# tree.add(1)
-# tree.add(0)
-# # tree.display()
-# print(tree.get_min())
-# print(tree.find(1))
-# print(tree.find(10))
 
-# import bintrees
-#
-# class Node:
-#     def __init__(self, data):
-#         self.key = data  # вирішуємо наліво чи направо
-#         self.value = None # додаткова інформація
-#         self.left = None
-#         self.right = None
-#
-#
-# tree = bintrees.AVLTree()
-#
-# tree.insert(key=10, value='apple')
-# tree.insert(key=11, value='orange')
-# tree.insert(key=5, value='pear')
-# tree.insert(key=9, value='melon')
-# tree.insert(key=20, value='banana')
-#
-#
-# # дістати елемент з id 5
-# print(tree[5])
-#
-# # ключі str
-#
-# tree = bintrees.AVLTree()
-#
-# tree.insert(key='apple', value='sweet juicy apple ')
-# tree.insert(key='orange', value='orange')
-# tree.insert(key='pear', value='pear')
-# tree.insert(key='melon', value='melon')
-# tree.insert(key='banana', value='banana')
-#
-# print(tree['apple'])
+# Напишіть "гру вгадати число": комп’ютер загадує число
+# від 1 до 100. Користувач вводить свої відповіді на що
+# отримує підказки більше\менше.
+# Якщо число вгадане менш ніж за 5 спроб, то переміг
+# користувач, інакше комп’ютер.
+# Реалізуйте такий функціонал:
+#  почати нову гру – користувач вводить числа до
+# правильної відповіді
+#  вивести результат – кількість перемог та програшів
+#  зберегти дані – зберегти кількості перемог та
+# програшів у файл
+#  завантажити дані – завантажити кількості перемог
+# та програшів
+# Реалізуйте все функціями
 
-# Створіть програму роботи зі словником. Наприклад,
-# англо-іспанський, французько-німецький або інша мовна пара.
-# Програма має:
-#  надавати початкове введення даних для словника
-#  відображати слово та його переклади
-#  дозволяти додавати, змінювати, видаляти переклади
-# слов
+import json
+import random
 
-from bintrees import AVLTree
+# Файл для збереження статистики
+file_stat = "game_stats1.json"
+
+def load_stats():
+    try:
+        with open(file_stat, "r") as file:
+            return json.load(file)
+    except Exception as ex:
+        print(ex)
+        return {"wins": 0, "losses": 0}
 
 
-class Word:
-    def __init__(self, name, translation):
-        self.name = name
-        self.translations = [translation]
+def save_stats(stats):
+    with open(file_stat, "w") as file:
+        json.dump(stats, file)
 
 
-class Dict:
-    def __init__(self):
-        self.tree_words = AVLTree()
+def play_game():
 
-    def add_word(self, name, translation):
-        if name in self.tree_words:
-            word = self.tree_words[name]
-            word.translations.append(translation)
+    number = random.randint(1, 100)
+    attempts = 0
+    stats = load_stats()
+
+    while True:
+        if attempts < 5 :
+
+            guess = int(input("Вгадайте число від 1 до 100: "))
+            if guess < 1 or guess > 100:
+                print("Будь ласка, введіть коректне число! ")
+                break
+
+            attempts += 1
+
+            if guess < number:
+                print("Більше Вгадайте! ")
+            elif guess > number:
+                print("Менше Вгадайте!")
+            else:
+                print(f"Ви вгадали число {number} за {attempts} спроб!")
+
+                stats["wins"] += 1
+                save_stats(stats)
+                break
+
         else:
-            new_word = Word(name, translation)
-            self.tree_words.insert(name, new_word)
-
-    def get(self, name):
-        return self.tree_words[name]
-
-
-my_dict = Dict()
-my_dict.add_word("run", "бігати")
-my_dict.add_word("run", "робити")
-run = my_dict.get("run")
-print(run.translations)
+            print(f"Комп'ютер переміг! число {number}")
+            stats["losses"] += 1
+            save_stats(stats)
+            break
 
 
+def show_stats():
+    stats = load_stats()
+    print(f"Перемог: {stats['wins']}, Програшів: {stats['losses']}")
 
+def main():
+    while True:
+        print("""Можливі дії: 
+                  1. Почати нову гру
+                  2. Вивести статистику
+                  3. Вийти.
+                  """)
 
+        choice = input("Оберіть дію: ")
 
+        if choice == "1":
+            play_game()
+        elif choice == "2":
+            show_stats()
+        elif choice == "3":
+            print("До побачення!")
+            break
+        else:
+            print("Невідома опція, спробуйте ще раз.")
 
-
+main()
