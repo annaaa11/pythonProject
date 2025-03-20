@@ -212,6 +212,7 @@ import gzip
 # Створіть список з трьох студентів. Збережіть цей список
 # використовуючи pickle та json.
 # Завантажте дані за допомогою pickle та json
+#######
 
 import json
 import pickle
