@@ -1,92 +1,57 @@
+
 """
-Використовуючи бінарні дерева, організуйте роботу
-автопарку, де зберігаються автомобілі, відсортовані за
-маркою
-Клас Car
-Атрибути:
- brand – модель автомобіля
- model – марка автомобіля
- year – рік випуску
-Клас CarPark
-Атрибути:
- cars – дерево з автомобілями
-Методи:
- add(car) – добавити автомобіль
- remove(model) – видалити автомобіль
- search(model) – пошук автомобіля за маркою, якщо є
-то повертає книгу інакше None
- __len__() – кількість автомобілів
- sell_car(client, model) – продати автомобіль клієнту,
-якщо така марка присутня
+Програма складається з трьох потоків. Перший
+просить в користувача вводити числа, поки не введено
+порожній рядок, та зберігає числа в список.
+Інші два потоки чекають поки перший завершить
+роботу, і вже потім запускаються. 
+
+Один рахує суму чисел в
+списку, інший рахує середнє арифметичне.
+Список чисел, сума та середнє виводяться на екран
+
 """
-import bintrees
-from bintrees import AVLTree
+import threading
 
-class Car:
-    def __init__(self, brand , model, year):
-        self.brand = brand
-        self.model = model
-        self.year = year
+numbers = []
 
-# Атрибути:
-#  brand – модель автомобіля
-#  model – марка автомобіля
-#  year – рік випуску
 
-class CarPark:
-    def __init__(self):
-        self.cars = bintrees.AVLTree()    # cars – дерево з     автомобілями
+def sum_numbers(numbers):
+    print(f"Сума чисел: {sum(numbers)}")
 
-    def add(self, car):
-        self.cars.insert(key=car.model, value=car)
 
-    def remove(self, model):
-        if model in self.cars:
-            self.cars.remove(model)
-        else:
-            print(f'автомобіля "{model}" немає!')
+def avg_numbers(numbers):
+    if len(numbers) == 0:
+        print("Середнє арифметичне неможливо обчислити (список пустий).")
+        return
+    avg = sum(numbers) / len(numbers)
+    print(f"Середнє арифметичне: {avg}")
 
-    def search(self, model):   #пошук автомобіля за маркою
 
-        if model in self.cars:
-            return self.cars[model]
-        else:
-            return None
+def read_numbers():
+    while True:
+        input_number = input("number: ")
+        if input_number == "":
+            break  # Завершаем ввод чисел
+        try:
+            numbers.append(int(input_number))
+        except ValueError:
+            print("Помилка: введіть ціле число.")
 
-    def __len__(self): #кількість автомобілів
-        return len(self.cars)
+    print(f"Список чисел: {numbers}")
 
-    def sell_car(self, client, model): #продати автомобіль клієнту,
-#якщо така марка присутня
-        car = self.search(model)
-        if not car:
-            print(f'автомобіля "{model}" немає!')
-            return
-        self.remove(model)
 
-        print(f'Клієнт {client} купив автомобіль  {model}')
+# Создаем и запускаем поток для ввода чисел
+read_thread = threading.Thread(target=read_numbers)
+read_thread.start()
+read_thread.join()  # Дожидаемся завершения потока
 
-    def display_info(self, model):
-        car = self.search(model)
-        print(f'''
-модель автомобіля - {car.brand}
-марка автомобіля - {car.model}
-рік випуску - {car.year}
-''')
+# Создаем потоки для вычислений
+sum_thread = threading.Thread(target=sum_numbers, args=(numbers,))
+avg_thread = threading.Thread(target=avg_numbers, args=(numbers,))
 
-park_cars = CarPark()
-cars = [
-    Car("x032", "BMW", 2003),
-    Car("nn889", "Audi", 2022),
-    Car("nn8890", "Cherry", 2021),
-]
+sum_thread.start()
+avg_thread.start()
 
-for car in cars:
-    park_cars.add(car)
-
-print(f"📚 кількість автомобілів {len(park_cars)} автопарку ")
-park_cars.display_info("Audi")
-park_cars.sell_car("Anna","Audi")
-#park_cars.display_info("Audi")
-
-print(f"📚 кількість автомобілів {len(park_cars)} автопарку ")
+sum_thread.join()
+avg_thread.join()
