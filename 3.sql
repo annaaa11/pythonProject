@@ -15,7 +15,6 @@
 -- оцінкою.
 -- Наповніть цю базу даних трьома студентами.
 
-
 CREATE TABLE GRADE_STUDENTS (
 	STUDENT_ID SERIAL PRIMARY KEY,
 	NAME_STUDENT VARCHAR(100),
@@ -62,4 +61,5 @@ FROM GRADE_STUDENTS
 SELECT NAME_STUDENT -- Показати ПІБ усіх студентів з AVG_GRADE, більшою, ніж зазначена.
 FROM GRADE_STUDENTS
 WHERE AVG_GRADE > 4
+
 
