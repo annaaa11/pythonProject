@@ -1,178 +1,212 @@
-from sqlalchemy import create_engine, Column, Integer, String, Sequence, Date
+from sqlalchemy import create_engine, MetaData, insert
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.sql import text
 import json
-from datetime import date
 
-# Створіть однотабличну базу даних People (ім’я, прізвище, місто, країна, дата народження) з однойменною
-# таблицею. Напишіть програму, яка дозволяє користувачеві ввести запит і отримати результати роботи запиту.
-# Підтримуйте лише SELECT як запит. Якщо ви спробуєте
-# виконати інші запити, потрібно буде генерувати помилку.
-
-# Додайте до програми по роботі з таблицею People
-# такий функціонал:
-#  добавити нову людину
-#  вивести людей, ім’я яких починається на певну літеру
-#  вивести людей, які народитись після певної дати
-#  вивести скільки людей живе у певній країні
-
-
+# завантажуємо логін та пароль
 with open('config.json', 'r') as file:
     data = json.load(file)
     login = data['login']
-    password = data ['password']
+    password = data['password']
 
-    db_url = f"postgresql+pg8000://{login}:{password}@localhost:5432/itstep"
+# підключаємось до бд itstep
+db_url = f"postgresql+pg8000://{login}:{password}@localhost:5432/itstep2"
 engine = create_engine(db_url)
 
-Base = declarative_base()
+metadata = MetaData()
+metadata.reflect(bind=engine)
 
-class People(Base):
-    __tablename__ = 'people'
-    id = Column(Integer, Sequence('user_id_seg'), primary_key=True)
-    name = Column(String(20))
-    surname = Column(String(20))
-    city = Column(String(20))
-    country = Column(String(20))
-    date_dr = Column(Date)
-
-
-    def __repr__(self):
-        return (f"id = {self.id}, name = {self.name}, surname = {self.surname}, city = {self.city}, "
-                f"country = {self.country}, date_dr = {self.date_dr} ")
-
-#Base.metadata.create_all(engine)
-
-people_list = [
-    People(name="Олександр", surname="Шевченко", city="Київ", country="Україна", date_dr=date(1990, 5, 15)),
-    People(name="Ірина", surname="Коваленко", city="Харків", country="Україна", date_dr=date(1985, 3, 10)),
-    People(name="Андрій", surname="Мельник", city="Львів", country="Україна", date_dr=date(1993, 7, 8)),
-    People(name="Світлана", surname="Іванова", city="Одеса", country="Україна", date_dr=date(1992, 1, 21)),
-    People(name="Віктор", surname="Петренко", city="Дніпро", country="Україна", date_dr=date(1988, 9, 30)),
-    People(name="Марія", surname="Гриценко", city="Запоріжжя", country="Україна", date_dr=date(1995, 11, 5)),
-    People(name="Євген", surname="Сидоренко", city="Полтава", country="Україна", date_dr=date(1989, 6, 12)),
-    People(name="Анна", surname="Ткаченко", city="Чернігів", country="Україна", date_dr=date(1991, 2, 28)),
-    People(name="Дмитро", surname="Кузьменко", city="Вінниця", country="Україна", date_dr=date(1994, 4, 17)),
-    People(name="Олена", surname="Литвин", city="Івано-Франківськ", country="Україна", date_dr=date(1987, 8, 23))
-]
-
-Session = sessionmaker(engine)
+Session = sessionmaker(bind=engine)
 session = Session()
-# session.add_all(people_list)
-# session.commit()
 
-def command1():
-    print('1 - добавити нову людину')
-    new_p = [People(name="Ганна", surname="Кузьменко", city="Вінниця", country="Україна", date_dr=date(1999, 4, 17))]
-    session.add_all(new_p)
-    session.commit()
+# вивести назви доступних таблиць
+# for table_name in metadata.tables:
+#     print(table_name)
 
 
-def command2():
-    liter = input('введіть певну літеру')
+# print(metadata.tables)
+
+# Вставляти рядки в таблиці бази даних.
+# ■ Оновлення рядків у таблицях бази даних. При спробі
+# оновлення усіх рядків в одній таблиці надайте запит на
+# підтвердження користувачеві. Оновлювати усі рядки
+# можна лише після підтвердження користувачем.
+# ■ Видалення рядків з таблиць баз даних. При спробі видалити
+# усі рядки в одній таблиці потрібно видавати користувачу
+# запит на підтвердження. Видаляти усі рядки, можна тільки
+# після підтвердження користувачем.
+
+def get_table():
+    print('Виберіть таблицю з бази')
+
+    for table_name in metadata.tables:
+        print(f'\t{table_name}')
+
+    user_table_name = input('Ваша відповідь: ')
+
+    return user_table_name
+
+def insert_row():
+    table_name = get_table()
+
+    # отримуємо саму таблицю по її назві
+    table = metadata.tables[table_name]
+
+    # список з даними рядка
+    values = []
+
+    # список з назвами стовпців
+    column_names = []
+
+    for column in table.columns:
+        # пропускаємо стовпчик id
+        if column.name == 'id':
+            continue
+
+        value = input(f'{column.name} = ')
+
+        values.append(value)
+        column_names.append(column.name)
+
+    # назви стовпців без лапок
+    new_column_names = tuple(column_names)
+    new_column_names = str(new_column_names)
+    new_column_names = new_column_names.replace('\'', '')
+
+    # запит по добавлянню рядка
 
     query = f"""
-    Select *
-    from people
-    where name LIKE '{liter}%'
+    INSERT INTO {table_name}
+    {new_column_names}
+    VALUES {tuple(values)}
     """
 
-    query_sql = text(query)
-    result = session.execute(query_sql)
-    rows = result.fetchall()
+    # print(query)
 
-    for row in rows:
-        print(row)
+    # виконати запит та обробити помилки
+    try:
+        query = text(query)
+        session.execute(query)
+        session.commit()
+    except Exception as err:
+        print(f"Помилка {err}")
 
-def command3():
-    #date_user = date(input('введіть дату - після певної дати'))
-    from datetime import datetime
-    date_str = input('введіть дату (у форматі РРРР-ММ-ДД) - після певної дати: ')
+
+def insert_row2():
+    # теж саме але без запиту
+    table_name = get_table()
+
+    # отримуємо саму таблицю по її назві
+    table = metadata.tables[table_name]
+
+    # словник: ключ - назва стовпця, значення - те що ввів користувач
+    values = {}
+
+
+    for column in table.columns:
+        # пропускаємо стовпчик id
+        if column.name == 'id':
+            continue
+
+        value = input(f'{column.name} = ')
+
+        values[column.name] = value
+
+    # добавляємо рядок
+    query = insert(table).values(values)
 
     try:
-        date_user = datetime.strptime(date_str, '%Y-%m-%d').date()
-    except ValueError:
-        print("Неправильний формат дати. Використовуйте формат РРРР-ММ-ДД.")
-        return
+        session.execute(query)
+        session.commit()
+    except Exception as err:
+        print(f"Помилка {err}")
 
+# Вивести прізвища та зарплати (сума ставки та надбавки)
+# лікарів, які не перебувають у відпустці;
+
+def doctors_notvac():
+
+    # запит
     query = f"""
-    Select *
-    from people
-    where date_dr > '{date_user}'
+    SELECT DOCTORS.SURNAME,  (DOCTORS.SALARY+DOCTORS.premium) as ZP
+FROM DOCTORS
+JOIN Vacations on Vacations.doctorid = doctors.id 
+WHERE now() NOT BETWEEN Vacations.startdate and Vacations.enddate
     """
 
-    query_sql = text(query)
-    result = session.execute(query_sql)
-    rows = result.fetchall()
+    # виконати запит та обробити помилки
+    try:
+        query = text(query) #- закоментується для другого варіанту (делете)
+        rows = session.execute(query)
+        rows = rows.fetchall()
+        session.commit()
+    except Exception as err:
+        print(f"Помилка {err}")
 
     for row in rows:
         print(row)
 
 
-def command4():
-    country_user = input('введіть певну країну')
+# ▷ Вивести назви палат, які знаходяться у певному відділенні;
 
+def wards_depart():
+
+    show_depart()
+
+    depart_name = input("відділенні ")
+    # запит
     query = f"""
-    Select COUNT(*)
-    from people
-    where country = '{country_user}'
+   SELECT WARDS.NAME 
+FROM WARDS
+JOIN Departments on Departments.id = WARDS.Departmentid
+WHERE Departments.NAME = '{depart_name}'
     """
 
-    query_sql = text(query)
-    result = session.execute(query_sql)
-    rows = result.fetchall()
+    # виконати запит та обробити помилки
+    try:
+        query = text(query) #- закоментується для другого варіанту (делете)
+        rows = session.execute(query)
+        rows = rows.fetchall()
+        session.commit()
+    except Exception as err:
+        print(f"Помилка {err}")
 
     for row in rows:
         print(row)
 
-# def command1():
-#     user_inp = input('введіть запит: ')
-#
-#     query_sql = text(user_inp)
-#
-#     # виконуємо запит
-#     result = session.execute(query_sql)
-#     rows = result.fetchall()
-#
-#     for row in rows:
-#         print(row)
+def show_depart():
 
-# def command2():
-#     user_city = input('введіть назву міста')
-#
-#     query = f"""
-#     Select *
-#     from peole
-#     where city = '{user_city}'
-#     """
-#
-#     query_sql = text(query)
-#     result = session.execute(query_sql)
-#     rows = result.fetchall()
-#
-#     for row in rows:
-#         print(row)
+    # запит
+    query = f"""
+   SELECT Departments.NAME 
+FROM Departments 
+    """
+
+    # виконати запит та обробити помилки
+    try:
+        query = text(query) #- закоментується для другого варіанту (делете)
+        rows = session.execute(query)
+        rows = rows.fetchall()
+        session.commit()
+    except Exception as err:
+        print(f"Помилка {err}")
+
+    for row in rows:
+        print(row)
 
 while True:
-    print(''' 1 - добавити нову людину 
-          2 - вивести людей, ім’я яких починається на певну літеру
-          3 - вивести людей, які народитись після певної дати
-          4 - вивести скільки людей живе у певній країні
-          ''')
-    command = input('введіть номер команди: ')
+    print("1 - вставити рядок в таблицю")
+    print("2 - Вивести прізвища та зарплати лікарів, які не перебувають у відпустці")
+    print("3 - Вивести назви палат, які знаходяться у певному відділенні")
+
+    command = input('Введіть номер команди: ')
 
     if command == '1':
-        command1()
-
+        insert_row2()
     elif command == '2':
-        command2()
-
+        doctors_notvac()
     elif command == '3':
-        command3()
-
-    elif command == '4':
-        command4()
-
+        wards_depart()
     else:
-        break
+        print('невірна команда')
